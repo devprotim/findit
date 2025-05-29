@@ -1,16 +1,25 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// For debugging
+console.log('Environment variables:');
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_PORT:', process.env.DB_PORT);
+
 // Create a new Sequelize instance with MySQL
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  'findit_db',
+  'root',
+  'root',
   {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+    host: 'localhost',
+    port: 3306,
     dialect: 'mysql',
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    logging: true,
+    // logging: false,
     pool: {
       max: 5,
       min: 0,

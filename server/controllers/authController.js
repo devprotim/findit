@@ -9,37 +9,37 @@ const { sequelize } = require('../config/database');
  */
 const register = async (req, res) => {
   const { email, password, role, firstName, lastName } = req.body;
-  
+
   const transaction = await sequelize.transaction();
-  
+
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
-    
+
     if (existingUser) {
       await transaction.rollback();
       return error(res, 400, 'User with this email already exists');
     }
-    
+
     // Create user
     const user = await User.create({
       email,
       password,
       role
     }, { transaction });
-    
+
     // Create profile
     await Profile.create({
       userId: user.id,
       firstName,
       lastName
     }, { transaction });
-    
+
     await transaction.commit();
-    
+
     // Generate token
     const token = generateToken(user);
-    
+
     return success(res, 201, 'User registered successfully', {
       user: {
         id: user.id,
@@ -61,25 +61,25 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   try {
     // Find user by email
     const user = await User.findOne({ where: { email } });
-    
+
     if (!user) {
       return error(res, 401, 'Invalid email or password');
     }
-    
+
     // Check password
     const isPasswordValid = await user.isValidPassword(password);
-    
+
     if (!isPasswordValid) {
       return error(res, 401, 'Invalid email or password');
     }
-    
+
     // Generate token
     const token = generateToken(user);
-    
+
     return success(res, 200, 'Login successful', {
       user: {
         id: user.id,
@@ -104,11 +104,11 @@ const getCurrentUser = async (req, res) => {
       include: [{ model: Profile, as: 'profile' }],
       attributes: { exclude: ['password'] }
     });
-    
+
     if (!user) {
       return error(res, 404, 'User not found');
     }
-    
+
     return success(res, 200, 'User profile retrieved successfully', { user });
   } catch (err) {
     console.error('Get current user error:', err);

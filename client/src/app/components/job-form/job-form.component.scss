@@ -1,0 +1,33 @@
+.job-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+}

@@ -1,0 +1,116 @@
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <p>Manage your personal information and preferences.</p>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Profile form -->
+    <div *ngIf="!loading" class="profile-content">
+        <mat-card class="profile-card">
+            <mat-card-content>
+                <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+                    <div class="form-section">
+                        <h2>Personal Information</h2>
+
+                        <div class="form-row">
+                            <mat-form-field appearance="outline">
+                                <mat-label>First Name</mat-label>
+                                <input matInput formControlName="firstName" placeholder="Enter your first name">
+                                <mat-error *ngIf="profileForm.get('firstName')?.errors?.['maxlength']">
+                                    First name cannot exceed 50 characters
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Last Name</mat-label>
+                                <input matInput formControlName="lastName" placeholder="Enter your last name">
+                                <mat-error *ngIf="profileForm.get('lastName')?.errors?.['maxlength']">
+                                    Last name cannot exceed 50 characters
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-row">
+                            <mat-form-field appearance="outline">
+                                <mat-label>Phone</mat-label>
+                                <input matInput formControlName="phone" placeholder="Enter your phone number">
+                                <mat-error *ngIf="profileForm.get('phone')?.errors?.['maxlength']">
+                                    Phone number cannot exceed 20 characters
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline">
+                                <mat-label>Address</mat-label>
+                                <input matInput formControlName="address" placeholder="Enter your address">
+                                <mat-error *ngIf="profileForm.get('address')?.errors?.['maxlength']">
+                                    Address cannot exceed 100 characters
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Job seeker specific fields -->
+                    <div *ngIf="isJobSeeker()" class="form-section">
+                        <h2>Job Seeker Information</h2>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Resume URL</mat-label>
+                            <input matInput formControlName="resumeUrl" placeholder="Enter URL to your resume">
+                            <mat-error *ngIf="profileForm.get('resumeUrl')?.errors?.['maxlength']">
+                                Resume URL cannot exceed 255 characters
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Employer specific fields -->
+                    <div *ngIf="isEmployer()" class="form-section">
+                        <h2>Company Information</h2>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Company Name</mat-label>
+                            <input matInput formControlName="companyName" placeholder="Enter your company name">
+                            <mat-error *ngIf="profileForm.get('companyName')?.errors?.['maxlength']">
+                                Company name cannot exceed 100 characters
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Company Description</mat-label>
+                            <textarea matInput formControlName="companyDescription"
+                                placeholder="Enter a description of your company" rows="4"></textarea>
+                            <mat-error *ngIf="profileForm.get('companyDescription')?.errors?.['maxlength']">
+                                Company description cannot exceed 1000 characters
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-actions">
+                        <button mat-raised-button color="primary" type="submit"
+                            [disabled]="profileForm.invalid || saving">
+                            <mat-spinner diameter="20" *ngIf="saving"></mat-spinner>
+                            <span *ngIf="!saving">Save Profile</span>
+                        </button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Account Information Card -->
+        <mat-card class="account-card">
+            <mat-card-header>
+                <mat-card-title>Account Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="account-info">
+                    <p><strong>Email:</strong> {{ user?.email }}</p>
+                    <p><strong>Role:</strong> {{ user?.role === 'job_seeker' ? 'Job Seeker' : 'Employer' }}</p>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

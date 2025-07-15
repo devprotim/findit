@@ -1,0 +1,117 @@
+<div class="job-detail-container">
+    <!-- Back button -->
+    <div class="back-button">
+        <button mat-stroked-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon> Back to Jobs
+        </button>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Job details -->
+    <div *ngIf="!loading && job" class="job-content">
+        <mat-card class="job-card">
+            <mat-card-header>
+                <mat-card-title>{{ job.title }}</mat-card-title>
+                <mat-card-subtitle>
+                    <div class="job-subtitle">
+                        <span><mat-icon>business</mat-icon> {{ job.employer?.profile?.companyName || 'Company' }}</span>
+                        <span><mat-icon>location_on</mat-icon> {{ job.location }}</span>
+                        <span><mat-icon>work</mat-icon> {{ job.jobType | titlecase }}</span>
+                        <span *ngIf="job.salaryRange"><mat-icon>attach_money</mat-icon> {{ job.salaryRange }}</span>
+                    </div>
+                </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="job-status">
+                    <mat-chip [color]="job.status === 'active' ? 'primary' : 'warn'" selected>
+                        {{ job.status | titlecase }}
+                    </mat-chip>
+                    <span class="job-date">Posted: {{ job.createdAt | date }}</span>
+                </div>
+
+                <div class="job-section">
+                    <h3>Description</h3>
+                    <p>{{ job.description }}</p>
+                </div>
+
+                <div *ngIf="job.requirements" class="job-section">
+                    <h3>Requirements</h3>
+                    <p>{{ job.requirements }}</p>
+                </div>
+
+                <!-- Application status for job seekers -->
+                <div *ngIf="isAuthenticated() && isJobSeeker() && userApplication" class="application-status">
+                    <h3>Your Application Status</h3>
+                    <div class="status-chip">
+                        <mat-chip [ngClass]="getApplicationStatusClass(userApplication.status)" selected>
+                            {{ userApplication.status | titlecase }}
+                        </mat-chip>
+                        <span>Applied on: {{ userApplication.createdAt | date }}</span>
+                    </div>
+                </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+                <!-- Actions for job seekers -->
+                <div *ngIf="isJobSeeker() && job.status === 'active'">
+                    <button *ngIf="!userApplication" mat-raised-button color="primary" (click)="applyForJob()"
+                        [disabled]="applying">
+                        <mat-spinner diameter="20" *ngIf="applying"></mat-spinner>
+                        <span *ngIf="!applying">Apply Now</span>
+                    </button>
+                    <button *ngIf="userApplication" mat-raised-button color="primary" disabled>
+                        Already Applied
+                    </button>
+                </div>
+
+                <!-- Actions for employers (job owners) -->
+                <div *ngIf="isEmployer() && isJobOwner()">
+                    <button mat-raised-button color="primary" (click)="editJob()">
+                        <mat-icon>edit</mat-icon> Edit Job
+                    </button>
+                    <button mat-stroked-button color="warn" class="action-button">
+                        <mat-icon>close</mat-icon> {{ job.status === 'active' ? 'Close Job' : 'Reopen Job' }}
+                    </button>
+                </div>
+
+                <!-- Login prompt for unauthenticated users -->
+                <div *ngIf="!isAuthenticated() && job.status === 'active'">
+                    <button mat-raised-button color="primary" [routerLink]="['/login']"
+                        [queryParams]="{returnUrl: '/jobs/' + job.id}">
+                        Login to Apply
+                    </button>
+                </div>
+            </mat-card-actions>
+        </mat-card>
+
+        <!-- Company info card -->
+        <mat-card *ngIf="job.employer?.profile" class="company-card">
+            <mat-card-header>
+                <mat-card-title>About the Company</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <h3>{{ job.employer?.profile?.companyName || 'Company' }}</h3>
+                <p *ngIf="job.employer?.profile?.companyDescription">
+                    {{ job.employer?.profile?.companyDescription }}
+                </p>
+                <p *ngIf="!job.employer?.profile?.companyDescription">
+                    No company description available.
+                </p>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="!loading && !job" class="error-container">
+        <mat-icon>error</mat-icon>
+        <p>Job not found or has been removed.</p>
+        <button mat-raised-button color="primary" (click)="goBack()">
+            Back to Jobs
+        </button>
+    </div>
+</div>

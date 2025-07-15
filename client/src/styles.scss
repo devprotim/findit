@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Import Angular Material theme first */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Add global styles for Angular Material */
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Material component styles */
+.mat-form-field {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.mat-card {
+  margin-bottom: 16px;
+}
+
+/* Fix for Material buttons */
+.mat-button, .mat-raised-button, .mat-flat-button, .mat-stroked-button {
+  text-transform: none !important;
+}
+
+/* Fix for Material icons */
+.material-icons {
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* Fix for Material form fields */
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+/* Fix for Material cards */
+.mat-card {
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12) !important;
+}
+
+/* Bootstrap customizations to work better with Material */
+.btn {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Ensure Bootstrap doesn't override Material styles */
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #3f51b5;
+}

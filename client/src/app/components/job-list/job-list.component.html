@@ -1,0 +1,90 @@
+<div class="job-list-container">
+    <div class="job-list-header">
+        <h1>{{ isEmployerView ? 'My Posted Jobs' : 'Browse Jobs' }}</h1>
+        <div *ngIf="isEmployer() && !isEmployerView" class="action-button">
+            <a mat-raised-button color="primary" routerLink="/create-job">
+                <mat-icon>add</mat-icon> Post a Job
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter section -->
+    <mat-card class="filter-card">
+        <mat-card-content>
+            <form [formGroup]="filterForm" class="filter-form">
+                <mat-form-field appearance="outline">
+                    <mat-label>Search</mat-label>
+                    <input matInput formControlName="search" placeholder="Job title, keywords...">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Location</mat-label>
+                    <input matInput formControlName="location" placeholder="City, state, remote...">
+                    <mat-icon matSuffix>location_on</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Job Type</mat-label>
+                    <select matNativeControl formControlName="jobType">
+                        <option value="">All Types</option>
+                        <option *ngFor="let type of jobTypes" [value]="type.value">
+                            {{ type.label }}
+                        </option>
+                    </select>
+                </mat-form-field>
+
+                <button mat-stroked-button color="primary" (click)="clearFilters()" type="button">
+                    <mat-icon>clear</mat-icon> Clear Filters
+                </button>
+            </form>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- No results message -->
+    <div *ngIf="!loading && jobs.length === 0" class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <p>No jobs found. Try adjusting your filters.</p>
+    </div>
+
+    <!-- Job cards -->
+    <div *ngIf="!loading && jobs.length > 0" class="job-cards">
+        <mat-card *ngFor="let job of jobs" class="job-card" (click)="viewJobDetails(job.id!)">
+            <mat-card-header>
+                <mat-card-title>{{ job.title }}</mat-card-title>
+                <mat-card-subtitle>
+                    <div class="job-subtitle">
+                        <span><mat-icon>business</mat-icon> {{ job.employer?.profile?.companyName || 'Company' }}</span>
+                        <span><mat-icon>location_on</mat-icon> {{ job.location }}</span>
+                    </div>
+                </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <p class="job-description">{{ job.description | slice:0:200 }}{{ job.description.length > 200 ? '...' :
+                    '' }}</p>
+                <div class="job-details">
+                    <mat-chip-set>
+                        <mat-chip>{{ job.jobType | titlecase }}</mat-chip>
+                        <mat-chip *ngIf="job.salaryRange">{{ job.salaryRange }}</mat-chip>
+                    </mat-chip-set>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-button color="primary">VIEW DETAILS</button>
+                <span class="spacer"></span>
+                <span class="job-date">Posted: {{ job.createdAt | date }}</span>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator *ngIf="totalItems > 0" [length]="totalItems" [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 50]" [pageIndex]="currentPage" (page)="onPageChange($event)"
+        aria-label="Select page">
+    </mat-paginator>
+</div>

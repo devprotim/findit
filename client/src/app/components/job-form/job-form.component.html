@@ -1,0 +1,71 @@
+<form [formGroup]="jobForm" (ngSubmit)="onSubmit()" class="job-form">
+    <!-- Title -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="title" placeholder="Enter job title" required>
+        <mat-error *ngIf="f['title'].errors?.['required']">Job title is required</mat-error>
+        <mat-error *ngIf="f['title'].errors?.['maxlength']">Job title cannot exceed 100 characters</mat-error>
+    </mat-form-field>
+
+    <!-- Location -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" placeholder="Enter job location (city, state, remote)" required>
+        <mat-error *ngIf="f['location'].errors?.['required']">Location is required</mat-error>
+        <mat-error *ngIf="f['location'].errors?.['maxlength']">Location cannot exceed 100 characters</mat-error>
+    </mat-form-field>
+
+    <!-- Job Type -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Job Type</mat-label>
+        <select matNativeControl formControlName="jobType" required>
+            <option *ngFor="let type of jobTypes" [value]="type.value">
+                {{ type.label }}
+            </option>
+        </select>
+        <mat-error *ngIf="f['jobType'].errors?.['required']">Job type is required</mat-error>
+    </mat-form-field>
+
+    <!-- Salary Range -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Salary Range (Optional)</mat-label>
+        <input matInput formControlName="salaryRange" placeholder="e.g. $50,000 - $70,000">
+        <mat-error *ngIf="f['salaryRange'].errors?.['maxlength']">Salary range cannot exceed 50 characters</mat-error>
+    </mat-form-field>
+
+    <!-- Description -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Job Description</mat-label>
+        <textarea matInput formControlName="description" placeholder="Enter detailed job description" rows="6"
+            required></textarea>
+        <mat-error *ngIf="f['description'].errors?.['required']">Job description is required</mat-error>
+        <mat-error *ngIf="f['description'].errors?.['maxlength']">Job description cannot exceed 5000
+            characters</mat-error>
+    </mat-form-field>
+
+    <!-- Requirements -->
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Requirements (Optional)</mat-label>
+        <textarea matInput formControlName="requirements" placeholder="Enter job requirements" rows="4"></textarea>
+        <mat-error *ngIf="f['requirements'].errors?.['maxlength']">Requirements cannot exceed 2000
+            characters</mat-error>
+    </mat-form-field>
+
+    <!-- Status (only for editing) -->
+    <mat-form-field *ngIf="job?.id" appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <select matNativeControl formControlName="status">
+            <option value="active">Active</option>
+            <option value="closed">Closed</option>
+        </select>
+    </mat-form-field>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="loading">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <span *ngIf="!loading">{{ job?.id ? 'Update Job' : 'Create Job' }}</span>
+        </button>
+    </div>
+</form>

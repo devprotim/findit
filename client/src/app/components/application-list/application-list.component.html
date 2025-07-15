@@ -1,0 +1,119 @@
+<div class="application-list-container">
+    <div class="application-list-header">
+        <h1>{{ isJobSeeker() ? 'My Applications' : (jobId ? 'Applications for This Job' : 'All Applications') }}</h1>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- No applications message -->
+    <div *ngIf="!loading && applications.length === 0" class="no-results">
+        <mat-icon>folder_open</mat-icon>
+        <p>{{ isJobSeeker() ? 'You have not applied to any jobs yet.' : 'No applications found.' }}</p>
+        <button mat-raised-button color="primary" routerLink="/jobs">Browse Jobs</button>
+    </div>
+
+    <!-- Applications table -->
+    <div *ngIf="!loading && applications.length > 0" class="applications-table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="applications-table">
+
+            <!-- Job Title Column -->
+            <ng-container matColumnDef="jobTitle">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</th>
+                <td mat-cell *matCellDef="let application">
+                    <a (click)="viewJobDetails(application.jobId)" class="job-link">
+                        {{ application.job?.title || 'Unknown Job' }}
+                    </a>
+                </td>
+            </ng-container>
+
+            <!-- Company Name Column (for job seekers) -->
+            <ng-container matColumnDef="companyName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Company</th>
+                <td mat-cell *matCellDef="let application">
+                    {{ application.job?.employer?.profile?.companyName || 'Unknown Company' }}
+                </td>
+            </ng-container>
+
+            <!-- Applicant Name Column (for employers) -->
+            <ng-container matColumnDef="applicantName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Applicant</th>
+                <td mat-cell *matCellDef="let application">
+                    {{ (application.applicant?.profile?.firstName || '') + ' ' +
+                    (application.applicant?.profile?.lastName || '') || application.applicant?.email || 'Unknown
+                    Applicant' }}
+                </td>
+            </ng-container>
+
+            <!-- Applied Date Column -->
+            <ng-container matColumnDef="appliedDate">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Applied Date</th>
+                <td mat-cell *matCellDef="let application">
+                    {{ application.createdAt | date }}
+                </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                <td mat-cell *matCellDef="let application">
+                    <span class="status-chip" [ngClass]="getStatusClass(application.status)">
+                        {{ application.status | titlecase }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let application">
+                    <!-- Actions for employers -->
+                    <div *ngIf="isEmployer()" class="action-buttons">
+                        <button mat-icon-button [matMenuTriggerFor]="statusMenu" aria-label="Change status">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #statusMenu="matMenu">
+                            <button mat-menu-item (click)="updateStatus(application, 'applied')"
+                                [disabled]="application.status === 'applied'">
+                                <span>Applied</span>
+                            </button>
+                            <button mat-menu-item (click)="updateStatus(application, 'reviewed')"
+                                [disabled]="application.status === 'reviewed'">
+                                <span>Reviewed</span>
+                            </button>
+                            <button mat-menu-item (click)="updateStatus(application, 'interviewed')"
+                                [disabled]="application.status === 'interviewed'">
+                                <span>Interviewed</span>
+                            </button>
+                            <button mat-menu-item (click)="updateStatus(application, 'rejected')"
+                                [disabled]="application.status === 'rejected'">
+                                <span>Rejected</span>
+                            </button>
+                            <button mat-menu-item (click)="updateStatus(application, 'hired')"
+                                [disabled]="application.status === 'hired'">
+                                <span>Hired</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+
+                    <!-- Actions for job seekers -->
+                    <div *ngIf="isJobSeeker()" class="action-buttons">
+                        <button mat-icon-button (click)="viewJobDetails(application.jobId)" aria-label="View job">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Pagination -->
+        <mat-paginator [length]="totalItems" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25, 50]"
+            [pageIndex]="currentPage" (page)="onPageChange($event)" aria-label="Select page">
+        </mat-paginator>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<div class="job-create-container">
+    <div class="job-create-header">
+        <h1 *ngIf="!jobId">Post a New Job</h1>
+        <h1 *ngIf="jobId">Edit Job</h1>
+        <p *ngIf="!jobId">Fill out the form below to create a new job listing.</p>
+        <p *ngIf="jobId">Update the information for this job listing.</p>
+    </div>
+
+    <mat-card class="job-create-card">
+        <mat-card-content>
+            <app-job-form [loading]="loading" [job]="job" (formSubmit)="onSubmit($event)" (formCancel)="onCancel()">
+            </app-job-form>
+        </mat-card-content>
+    </mat-card>
+</div>

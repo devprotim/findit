@@ -1,0 +1,31 @@
+<mat-toolbar color="primary">
+    <a mat-button routerLink="/" class="logo">FindIt</a>
+    <span class="spacer"></span>
+
+    <!-- Public links -->
+    <a mat-button routerLink="/jobs" routerLinkActive="active">Browse Jobs</a>
+
+    <!-- Links for authenticated users -->
+    <ng-container *ngIf="isAuthenticated$ | async; else unauthenticatedLinks">
+        <!-- Employer links -->
+        <ng-container *ngIf="isEmployer()">
+            <a mat-button routerLink="/my-jobs" routerLinkActive="active">My Jobs</a>
+            <a mat-button routerLink="/create-job" routerLinkActive="active">Post Job</a>
+        </ng-container>
+
+        <!-- Job seeker links -->
+        <ng-container *ngIf="isJobSeeker()">
+            <a mat-button routerLink="/my-applications" routerLinkActive="active">My Applications</a>
+        </ng-container>
+
+        <!-- Common authenticated links -->
+        <a mat-button routerLink="/profile" routerLinkActive="active">Profile</a>
+        <button mat-button (click)="logout()">Logout</button>
+    </ng-container>
+
+    <!-- Links for unauthenticated users -->
+    <ng-template #unauthenticatedLinks>
+        <a mat-button routerLink="/login" routerLinkActive="active">Login</a>
+        <a mat-button routerLink="/register" routerLinkActive="active">Register</a>
+    </ng-template>
+</mat-toolbar>

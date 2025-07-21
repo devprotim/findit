@@ -5,6 +5,9 @@ const { sequelize, testConnection } = require('./config/database');
 // Start server
 const PORT = config.server.port;
 
+// Export app for serverless deployment (Vercel)
+module.exports = app;
+
 const startServer = async () => {
   try {
     // Test database connection

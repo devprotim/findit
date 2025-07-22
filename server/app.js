@@ -22,6 +22,16 @@ if (config.server.env === 'development') {
   app.use(morgan('combined'));
 }
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is working!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // API Routes
 app.use('/api', routes);
 

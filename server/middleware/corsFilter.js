@@ -6,6 +6,8 @@
 const allowedOrigins = [
   'http://localhost:4200',  // Development Angular
   'http://localhost:3000',  // Development server
+  'http://127.0.0.1:4200',  // Alternative localhost
+  'http://127.0.0.1:3000',  // Alternative localhost
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
   ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
 ].filter(Boolean);
@@ -14,21 +16,9 @@ const corsFilter = (req, res, next) => {
   const origin = req.headers.origin;
 
   // Security logging
-  console.log(`CORS request from origin: ${origin}`);
+  console.log(`CORS request from origin: ${origin}, method: ${req.method}, path: ${req.path}`);
 
-  // Dynamic origin validation
-  if (allowedOrigins.includes(origin) || !origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-  } else {
-    // Log suspicious requests
-    console.warn(`Blocked CORS request from unauthorized origin: ${origin}`);
-    return res.status(403).json({
-      error: 'CORS policy violation',
-      message: 'Origin not allowed'
-    });
-  }
-
-  // Set CORS headers
+  // Set CORS headers first (before any validation)
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-API-Key'
@@ -36,9 +26,31 @@ const corsFilter = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 
-  // Handle preflight requests
+  // Handle preflight requests first
   if (req.method === 'OPTIONS') {
+    // For OPTIONS requests, be more permissive with origin
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else if (!origin || origin === 'null') {
+      // Handle same-origin requests or requests without origin
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     return res.status(200).end();
+  }
+
+  // Dynamic origin validation for actual requests
+  if (allowedOrigins.includes(origin) || !origin || origin === 'null') {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else {
+    // Log suspicious requests
+    console.warn(`Blocked CORS request from unauthorized origin: ${origin}`);
+    res.setHeader('Access-Control-Allow-Origin', 'null');
+    return res.status(403).json({
+      error: 'CORS policy violation',
+      message: 'Origin not allowed'
+    });
   }
 
   next();

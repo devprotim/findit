@@ -1,9 +1,9 @@
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
+const { corsFilter } = require('./middleware/corsFilter');
 const config = require('./config/config');
 
 // Initialize Express app
@@ -11,7 +11,7 @@ const app = express();
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors(config.cors)); // Enable CORS with configuration
+app.use(corsFilter); // Custom CORS security filter
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 

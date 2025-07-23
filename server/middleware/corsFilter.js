@@ -12,6 +12,13 @@ const allowedOrigins = [
   ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
 ].filter(Boolean);
 
+// Add dynamic Vercel preview URLs
+const isDynamicVercelOrigin = (origin) => {
+  if (!origin) return false;
+  // Match Vercel preview URLs pattern
+  return origin.match(/^https:\/\/.*\.vercel\.app$/) !== null;
+};
+
 const corsFilter = (req, res, next) => {
   const origin = req.headers.origin;
 
@@ -26,22 +33,25 @@ const corsFilter = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 
+  // Check if origin is allowed
+  const isOriginAllowed = allowedOrigins.includes(origin) ||
+    isDynamicVercelOrigin(origin) ||
+    !origin ||
+    origin === 'null';
+
   // Handle preflight requests first
   if (req.method === 'OPTIONS') {
-    // For OPTIONS requests, be more permissive with origin
-    if (origin && allowedOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-    } else if (!origin || origin === 'null') {
-      // Handle same-origin requests or requests without origin
-      res.setHeader('Access-Control-Allow-Origin', '*');
+    if (isOriginAllowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin || '*');
     } else {
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      console.warn(`Blocked OPTIONS request from unauthorized origin: ${origin}`);
+      res.setHeader('Access-Control-Allow-Origin', 'null');
     }
     return res.status(200).end();
   }
 
   // Dynamic origin validation for actual requests
-  if (allowedOrigins.includes(origin) || !origin || origin === 'null') {
+  if (isOriginAllowed) {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
   } else {
     // Log suspicious requests
